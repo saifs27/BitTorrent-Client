@@ -1,12 +1,9 @@
-
 INTEGER_START = b'i'
 LIST_START = b'l'
 DICT_START  = b'd'
-END = b'e'
+END = 'e'
 STRING_START = b'0123456789'
 STRING_SEP = b':'
-
-
 
 class Decoder():
     def __init__(self, data: str):
@@ -41,21 +38,25 @@ class Decoder():
 
     def decode_int(self):
         res = ""
-        i = 1
-        while self.data[self.ptr + i] != END:  
-            res += self.data[self.ptr + i]
-            i += 1
-        self.ptr += i
+        self.ptr += 1
+        while self.data[self.ptr] != END:  
+            res += self.data[self.ptr]
+            self.ptr += 1
         return int(res)
 
     def decode_string(self):
         res = ""
-        i = 2
-        while self.data[self.ptr + i] != END:
-            res += self.data[self.ptr+i]
-            i += 1
-        self.ptr += i
+        str_size = ""
+        while self.data[self.ptr] != ":":
+            str_size += self.data[self.ptr]
+            self.ptr += 1
+        str_size = int(str_size)
+        self.ptr += 1
 
+        for i in range(str_size):
+            res += self.data[self.ptr]
+            self.ptr += 1
+            
         return res
         
         
@@ -63,6 +64,6 @@ class Decoder():
 
 
 class Encoder():
-    def __init__(self):
+    def __init__(self, ):
         ...
     
