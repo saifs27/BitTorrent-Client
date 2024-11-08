@@ -1,9 +1,9 @@
-INTEGER_START = b'i'
-LIST_START = b'l'
-DICT_START  = b'd'
+INTEGER_START = 'i'
+LIST_START = 'l'
+DICT_START  = 'd'
 END = 'e'
-STRING_START = b'0123456789'
-STRING_SEP = b':'
+STRING_START = '0123456789'
+STRING_SEP = ':'
 
 class Decoder():
     def __init__(self, data: str):
@@ -25,23 +25,32 @@ class Decoder():
 
     def decode_list(self):
         res = []
-        i = 1
-        while self.data[self.ptr + i] != END:
-            if self.data[self.ptr + i] == INTEGER_START:
+        while self.data[self.ptr] != END:
+            if self.data[self.ptr] == INTEGER_START:
                 res.append(self.decode_int())
-            if self.data[self.ptr + i] == STRING_START:
-                ...
+            elif self.data[self.ptr] == STRING_START:
+                res.append(self.decode_string())
+        return res
+            
             
     
     def decode_dict(self):
         res = {}
-
+        d = (1,2)
+        while self.data[self.ptr] != END:
+            if self.data[self.ptr] == INTEGER_START:
+                res.append(self.decode_int())
+                res
+            elif self.data[self.ptr] == STRING_START:
+                res.append(self.decode_string())
+        return res
     def decode_int(self):
         res = ""
         self.ptr += 1
         while self.data[self.ptr] != END:  
             res += self.data[self.ptr]
             self.ptr += 1
+        self.ptr += 1
         return int(res)
 
     def decode_string(self):
@@ -56,7 +65,9 @@ class Decoder():
         for i in range(str_size):
             res += self.data[self.ptr]
             self.ptr += 1
-            
+
+        self.ptr+=1
+
         return res
         
         
