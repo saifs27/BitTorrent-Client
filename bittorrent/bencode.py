@@ -25,15 +25,24 @@ class Decoder():
 
     def decode_list(self):
         res = []
+        self.ptr += 1
+        str_len = len(self.data)
         while self.data[self.ptr] != END:
+            assert(self.ptr < str_len, f"ptr: {self.ptr}, data: {self.data}")
             if self.data[self.ptr] == INTEGER_START:
-                res.append(self.decode_int())
-            elif self.data[self.ptr] == STRING_START:
-                res.append(self.decode_string())
+                self.decode_int()
+                integer = self.decode_int()
+                res.append(integer)
+
+            elif self.data[self.ptr] in STRING_START:
+                self.decode_string()
+                string = self.decode_string()
+                res.append(string)
+            else:
+                return self.data[self.ptr] 
+            self.ptr += 1
         return res
-            
-            
-    
+             
     def decode_dict(self):
         res = {}
         d = (1,2)
@@ -56,25 +65,61 @@ class Decoder():
     def decode_string(self):
         res = ""
         str_size = ""
-        while self.data[self.ptr] != ":":
+        while self.data[self.ptr] != STRING_SEP :
             str_size += self.data[self.ptr]
             self.ptr += 1
         str_size = int(str_size)
         self.ptr += 1
 
-        for i in range(str_size):
+        for _ in range(str_size):
             res += self.data[self.ptr]
             self.ptr += 1
 
         self.ptr+=1
 
         return res
-        
-        
-
 
 
 class Encoder():
-    def __init__(self, ):
-        ...
+    def __init__(self, data):
+        self.data = data
+        self.ptr = 0
+
+    def encode(self):
+        return self._encode(self.data)
+        
+    def encode_int(self, integer: int):
+        return "i" + str(integer)  + "e"
     
+    def encode_string(self, string: str):
+        string_size = len(string)
+        return f"{string_size}:{string}"
+    
+    def encode_list(self, list: list):
+        list_items="l"
+        for i in list:
+            list_items += self._encode(i)    
+        return f"{list_items}e"
+    
+    def encode_dict(self, dictionary: dict):
+        dict_items = "d"
+
+        for key, value in dictionary.items():
+            dict_items += self._encode(key)
+            dict_items += self._encode(value)
+            
+        return f"{dict_items}e"
+     
+    def _encode(self, i):
+            if isinstance(i, int):
+                return self.encode_int(i)
+            if isinstance(i, str):
+                return self.encode_string(i)
+            if isinstance(i, list):
+                return self.encode_list(i)
+            if isinstance(i, dict):
+                return self.encode_dict(i)
+            raise NotImplementedError("Unsupported type")
+
+            
+ 
