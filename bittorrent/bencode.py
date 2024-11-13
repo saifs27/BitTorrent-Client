@@ -16,43 +16,31 @@ class Decoder():
             return self.decode_int()
         if c == LIST_START:
             return self.decode_list()
-        if c == DICT_START():
+        if c == DICT_START:
             return self.decode_dict()
         if c in STRING_START:
             return self.decode_string()
         if c == END:
             return None
+        raise ValueError("Cannot parse type")
 
     def decode_list(self):
         res = []
         self.ptr += 1
-        str_len = len(self.data)
         while self.data[self.ptr] != END:
-            assert(self.ptr < str_len, f"ptr: {self.ptr}, data: {self.data}")
-            if self.data[self.ptr] == INTEGER_START:
-                self.decode_int()
-                integer = self.decode_int()
-                res.append(integer)
-
-            elif self.data[self.ptr] in STRING_START:
-                self.decode_string()
-                string = self.decode_string()
-                res.append(string)
-            else:
-                return self.data[self.ptr] 
-            self.ptr += 1
+            i = self.decode()
+            res.append(i)
         return res
              
     def decode_dict(self):
         res = {}
-        d = (1,2)
+        self.ptr += 1
         while self.data[self.ptr] != END:
-            if self.data[self.ptr] == INTEGER_START:
-                res.append(self.decode_int())
-                res
-            elif self.data[self.ptr] == STRING_START:
-                res.append(self.decode_string())
+            key = self.decode()
+            value = self.decode()
+            res[key] = value
         return res
+    
     def decode_int(self):
         res = ""
         self.ptr += 1
@@ -75,9 +63,9 @@ class Decoder():
             res += self.data[self.ptr]
             self.ptr += 1
 
-        self.ptr+=1
 
         return res
+
 
 
 class Encoder():
@@ -119,7 +107,7 @@ class Encoder():
                 return self.encode_list(i)
             if isinstance(i, dict):
                 return self.encode_dict(i)
-            raise NotImplementedError("Unsupported type")
+            raise TypeError("Unsupported type. Must be int, string, list, or dictionary")
 
             
  
